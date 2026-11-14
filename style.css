@@ -1,0 +1,739 @@
+/* ============================================================
+   style.css — 和の高級卓（黒漆 + 金 + 畳）
+
+   スマホ縦画面を基準に作り、横向きと広い画面で調整する。
+   高さは 100dvh を基準にして、画面に収める（スクロールさせない）。
+============================================================ */
+
+:root {
+    /* 漆と畳 */
+    --lacquer: #120f0c;
+    --lacquer-2: #1c1713;
+    --tatami: #4a5c3a;
+    --tatami-2: #3b4a2e;
+
+    /* 金 */
+    --gold: #b89445;
+    --gold-bright: #e0bd6a;
+    --gold-dim: rgba(184, 148, 69, .2);
+
+    /* 朱と墨 */
+    --vermilion: #b03a2e;
+    --ink: #f2ede1;
+    --muted: #9a9183;
+    --line: rgba(184, 148, 69, .22);
+
+    --serif: "Shippori Mincho", "Hiragino Mincho ProN", serif;
+    --sans: "Zen Kaku Gothic New", system-ui, sans-serif;
+
+    /* カードの大きさ。画面幅に応じて変わる */
+    --card-w: 58px;
+    --card-h: 82px;
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+    height: 100%;
+    overflow: hidden;
+}
+
+body {
+    margin: 0;
+    background: var(--lacquer);
+    color: var(--ink);
+    font-family: var(--sans);
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+    touch-action: manipulation;
+}
+
+/* 画面全体。縦に積んで、場だけが伸び縮みする */
+.app {
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    background:
+        radial-gradient(ellipse 120% 60% at 50% 42%, rgba(74, 92, 58, .5), transparent 70%),
+        linear-gradient(180deg, var(--lacquer), var(--lacquer-2) 40%, var(--lacquer));
+}
+
+/* ============================================================
+   上段
+============================================================ */
+.topbar {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(0, 0, 0, .4), transparent);
+}
+
+.round-box {
+    display: flex;
+    align-items: baseline;
+    gap: 1px;
+    min-width: 54px;
+}
+
+.round-label {
+    font-family: var(--serif);
+    font-size: 10px;
+    color: var(--muted);
+}
+
+.round-num {
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--gold-bright);
+    padding: 0 2px;
+}
+
+.brand {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: .3em;
+    text-indent: .3em;
+    color: var(--gold-bright);
+    text-shadow: 0 0 18px rgba(224, 189, 106, .35);
+}
+
+.badges {
+    display: flex;
+    gap: 4px;
+    min-width: 54px;
+    justify-content: flex-end;
+}
+
+.badge {
+    font-family: var(--serif);
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 2px;
+    border: 1px solid currentColor;
+    opacity: 0;
+    transition: opacity .25s;
+}
+
+.badge.on {
+    opacity: 1;
+}
+
+.badge.rev { color: var(--vermilion); background: rgba(176, 58, 46, .12); }
+.badge.ele { color: #6fa8d8; background: rgba(111, 168, 216, .12); }
+.badge.lock { color: var(--gold); background: var(--gold-dim); }
+
+/* ============================================================
+   CPU3人
+============================================================ */
+.seats {
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    padding: 10px 10px 6px;
+}
+
+.seat {
+    background: rgba(0, 0, 0, .3);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 7px 6px;
+    text-align: center;
+    transition: all .25s;
+    position: relative;
+    overflow: hidden;
+}
+
+/* 手番の人を光らせる */
+.seat.active {
+    border-color: var(--gold-bright);
+    background: rgba(184, 148, 69, .12);
+    box-shadow: 0 0 16px rgba(184, 148, 69, .25) inset;
+}
+
+.seat-title {
+    font-family: var(--serif);
+    font-size: 9px;
+    color: var(--gold);
+    letter-spacing: .08em;
+}
+
+.seat-name {
+    font-family: var(--serif);
+    font-size: 13px;
+    margin: 1px 0 3px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.seat-count {
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.seat-count b {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--ink);
+    padding-right: 1px;
+}
+
+/* 残りが少ないと朱に変わる */
+.seat.danger .seat-count b {
+    color: var(--vermilion);
+}
+
+/* 直前の行動（出した／パス） */
+.seat-act {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-size: 15px;
+    letter-spacing: .1em;
+    background: rgba(18, 15, 12, .9);
+    opacity: 0;
+    pointer-events: none;
+}
+
+.seat-act.show {
+    animation: actFlash 1.1s ease-out;
+}
+
+@keyframes actFlash {
+    0% { opacity: 0; transform: scale(.9); }
+    18% { opacity: 1; transform: scale(1); }
+    70% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+.seat-act.pass { color: var(--muted); }
+.seat-act.play { color: var(--gold-bright); }
+
+/* 上がった人 */
+.seat.finished {
+    opacity: .45;
+}
+
+.seat.finished::after {
+    content: attr(data-rank);
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-size: 15px;
+    color: var(--gold-bright);
+    background: rgba(18, 15, 12, .78);
+}
+
+/* ============================================================
+   場
+============================================================ */
+.field {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: calc(var(--card-h) + 46px);
+    padding: 4px 12px;
+    position: relative;
+}
+
+/* 畳の目 */
+.field::before {
+    content: "";
+    position: absolute;
+    inset: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    background:
+        repeating-linear-gradient(90deg, rgba(255, 255, 255, .018) 0 1px, transparent 1px 7px),
+        linear-gradient(180deg, var(--tatami-2), var(--tatami));
+    opacity: .5;
+    pointer-events: none;
+}
+
+.field-inner {
+    position: relative;
+    text-align: center;
+    width: 100%;
+}
+
+.field-tray {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    min-height: calc(var(--card-h) + 6px);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.field-msg {
+    margin: 8px 0 0;
+    font-family: var(--serif);
+    font-size: 12px;
+    letter-spacing: .14em;
+    color: var(--muted);
+    min-height: 18px;
+}
+
+/* ============================================================
+   カード
+============================================================ */
+.card {
+    width: var(--card-w);
+    height: var(--card-h);
+    background: linear-gradient(150deg, #fbf8f0, #ece5d6);
+    border-radius: 4px;
+    box-shadow: 0 2px 7px rgba(0, 0, 0, .5);
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* 左上の角。重ねて並べても、ここだけは必ず見えるようにする */
+.card .corner {
+    position: absolute;
+    top: 3px;
+    left: 4px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    line-height: 1;
+}
+
+.card .corner b {
+    font-family: var(--serif);
+    font-size: calc(var(--card-w) * .3);
+    font-weight: 700;
+}
+
+.card .corner i {
+    font-style: normal;
+    font-size: calc(var(--card-w) * .24);
+    margin-top: 1px;
+}
+
+.card .big {
+    position: absolute;
+    bottom: 4px;
+    right: 5px;
+    font-size: calc(var(--card-w) * .38);
+    line-height: 1;
+    opacity: .9;
+}
+
+.card.red { color: #b02a2a; }
+.card.black { color: #1a1a1c; }
+
+.card.joker {
+    background: linear-gradient(150deg, #2a2420, #1a1612);
+    color: var(--gold-bright);
+    border: 1px solid var(--gold);
+}
+
+.card.joker .corner b {
+    font-size: calc(var(--card-w) * .2);
+    letter-spacing: .02em;
+}
+
+.card.joker .corner i {
+    font-size: calc(var(--card-w) * .16);
+    letter-spacing: .02em;
+}
+
+/* 場に出たときの動き */
+.card.in {
+    animation: cardIn .26s cubic-bezier(.2, .8, .3, 1.15) both;
+}
+
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(26px) scale(.86); }
+    to { opacity: 1; transform: none; }
+}
+
+/* ============================================================
+   自分の席と手札
+============================================================ */
+.me {
+    flex: 0 0 auto;
+    padding: 4px 0 8px;
+}
+
+.me-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 0 14px 5px;
+}
+
+.me-name {
+    font-family: var(--serif);
+    font-size: 13px;
+    color: var(--gold-bright);
+    letter-spacing: .14em;
+}
+
+.me-count {
+    font-size: 11px;
+    color: var(--muted);
+}
+
+.me-count b {
+    font-size: 16px;
+    color: var(--ink);
+    padding-right: 1px;
+}
+
+/* 手札の入れ物。スワイプを受け取る */
+.hand-wrap {
+    position: relative;
+    padding: 14px 10px 6px;
+    touch-action: pan-y;
+}
+
+.hand {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    min-height: calc(var(--card-h) + 18px);
+}
+
+/*
+   slot = タップを受け取る枠。
+   幅は「見えている部分」だけにしてあるので、
+   隣の札にタップを奪われない。
+*/
+.hand .slot {
+    position: relative;
+    height: var(--card-h);
+    flex-shrink: 0;
+    cursor: pointer;
+}
+
+.hand .slot .card {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    transition: transform .16s cubic-bezier(.2, .8, .3, 1.1), filter .16s;
+    transform-origin: bottom center;
+}
+
+/* 選んだ札は上にせり出す */
+.hand .slot.picked {
+    z-index: 50 !important;
+}
+
+.hand .slot.picked .card {
+    transform: translateY(-18px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, .6), 0 0 0 2px var(--gold-bright);
+}
+
+/* 出せない札は暗くする */
+.hand .slot.dim .card {
+    filter: brightness(.4) saturate(.45);
+}
+
+.swipe-guide {
+    position: absolute;
+    top: -2px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 10px;
+    letter-spacing: .16em;
+    color: var(--gold);
+    opacity: 0;
+    transition: opacity .2s;
+    pointer-events: none;
+}
+
+.swipe-guide.show {
+    opacity: .85;
+}
+
+/* ============================================================
+   操作ボタン
+============================================================ */
+.controls {
+    display: flex;
+    gap: 8px;
+    padding: 6px 12px 0;
+}
+
+.btn {
+    flex: 1;
+    padding: 13px 10px;
+    border-radius: 3px;
+    font-family: var(--serif);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: .16em;
+    text-indent: .16em;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all .16s;
+}
+
+.btn.ghost {
+    background: transparent;
+    color: var(--muted);
+    border-color: var(--line);
+    flex: 0 0 auto;
+    padding: 13px 16px;
+    font-size: 13px;
+}
+
+.btn.ghost:active:not(:disabled) {
+    background: rgba(255, 255, 255, .05);
+}
+
+.btn.gold {
+    background: linear-gradient(180deg, var(--gold-bright), var(--gold));
+    color: #1a1510;
+}
+
+.btn.gold:active:not(:disabled) {
+    filter: brightness(1.1);
+    transform: scale(.985);
+}
+
+.btn.wide {
+    width: 100%;
+    flex: none;
+    margin-top: 18px;
+}
+
+.btn:disabled {
+    opacity: .28;
+    cursor: not-allowed;
+}
+
+.hint {
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 5px 14px 8px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--muted);
+    min-height: 26px;
+    line-height: 1.5;
+}
+
+.hint.warn {
+    color: #e0a0a0;
+}
+
+/* ============================================================
+   かぶせ画面（結果・交換・開始）
+============================================================ */
+.overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(10, 8, 6, .86);
+    backdrop-filter: blur(4px);
+}
+
+.overlay.show {
+    display: flex;
+}
+
+.sheet {
+    width: 100%;
+    max-width: 380px;
+    background: linear-gradient(180deg, #221c17, #16120f);
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    padding: 26px 22px 22px;
+    text-align: center;
+    animation: sheetIn .28s cubic-bezier(.2, .8, .3, 1.1) both;
+    max-height: 88dvh;
+    overflow-y: auto;
+}
+
+@keyframes sheetIn {
+    from { opacity: 0; transform: translateY(16px) scale(.97); }
+    to { opacity: 1; transform: none; }
+}
+
+.sheet-crest {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 14px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-size: 24px;
+    color: var(--gold-bright);
+}
+
+.sheet-title {
+    margin: 0;
+    font-family: var(--serif);
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: .2em;
+    text-indent: .2em;
+    color: var(--gold-bright);
+}
+
+.sheet-title.big {
+    font-size: 30px;
+    letter-spacing: .28em;
+    text-indent: .28em;
+}
+
+.sheet-sub {
+    margin: 0 0 4px;
+    font-size: 11px;
+    letter-spacing: .2em;
+    color: var(--muted);
+}
+
+.sheet-text {
+    margin: 14px 0 0;
+    font-size: 12px;
+    line-height: 2;
+    color: var(--muted);
+}
+
+/* 順位の一覧 */
+.rank-list {
+    list-style: none;
+    margin: 20px 0 0;
+    padding: 0;
+    text-align: left;
+}
+
+.rank-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    margin-bottom: 6px;
+    font-size: 13px;
+}
+
+.rank-list li.me {
+    border-color: var(--gold);
+    background: var(--gold-dim);
+}
+
+.rank-list .rank-title {
+    font-family: var(--serif);
+    font-size: 12px;
+    color: var(--gold-bright);
+    min-width: 48px;
+}
+
+.rank-list .rank-name {
+    flex: 1;
+}
+
+.rank-list .rank-pt {
+    font-size: 11px;
+    color: var(--muted);
+}
+
+/* 交換するカード */
+.exchange-row {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+}
+
+/* ============================================================
+   画面が広いとき（タブレット・PC）
+============================================================ */
+@media (min-width: 560px) {
+    :root {
+        --card-w: 62px;
+        --card-h: 88px;
+    }
+
+    .brand { font-size: 20px; }
+    .seats { max-width: 560px; margin: 0 auto; }
+    .controls { max-width: 480px; margin: 0 auto; }
+}
+
+@media (min-width: 900px) {
+    :root {
+        --card-w: 70px;
+        --card-h: 100px;
+    }
+
+    .app { max-width: 840px; margin: 0 auto; }
+}
+
+/* ============================================================
+   横向き（高さが足りないとき）
+   カードを小さくし、CPU欄を1行に詰める
+============================================================ */
+@media (orientation: landscape) and (max-height: 540px) {
+    :root {
+        --card-w: 42px;
+        --card-h: 60px;
+    }
+
+    .topbar { padding: 4px 12px; }
+    .brand { font-size: 14px; }
+
+    .seats {
+        padding: 6px 10px 4px;
+        gap: 5px;
+    }
+
+    .seat { padding: 4px 5px; }
+    .seat-title { font-size: 8px; }
+    .seat-name { font-size: 11px; margin: 0 0 1px; }
+    .seat-count b { font-size: 14px; }
+
+    .field { padding: 2px 10px; }
+    .field-msg { margin-top: 4px; font-size: 10px; min-height: 14px; }
+
+    .me-head { padding: 0 12px 3px; }
+    .hand-wrap { padding: 10px 8px 4px; }
+    .controls { padding: 4px 10px 0; }
+    .btn { padding: 9px 8px; font-size: 13px; }
+    .btn.ghost { padding: 9px 12px; font-size: 12px; }
+    .hint { padding: 3px 12px 5px; min-height: 18px; font-size: 10px; }
+}
+
+/* 画面がとても狭いとき */
+@media (max-width: 340px) {
+    :root {
+        --card-w: 44px;
+        --card-h: 62px;
+    }
+
+    .seat-name { font-size: 11px; }
+    .btn { font-size: 13px; }
+}

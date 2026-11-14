@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#120f0c">
+    <title>大富豪</title>
+    <link rel="stylesheet" href="style.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <div class="app">
+
+        <!-- ===== 上段：局数と場の状態 ===== -->
+        <header class="topbar">
+            <div class="round-box">
+                <span class="round-label">第</span>
+                <span class="round-num" id="roundNum">1</span>
+                <span class="round-label">局</span>
+            </div>
+            <h1 class="brand">大富豪</h1>
+            <div class="badges">
+                <span class="badge rev" id="badgeRevolution">革命</span>
+                <span class="badge ele" id="badgeEleven">11</span>
+                <span class="badge lock" id="badgeLock">縛</span>
+            </div>
+        </header>
+
+        <!-- ===== CPU3人 ===== -->
+        <section class="seats" id="seats"></section>
+
+        <!-- ===== 場 ===== -->
+        <section class="field">
+            <div class="field-inner">
+                <div class="field-tray" id="fieldTray"></div>
+                <p class="field-msg" id="fieldMsg">場が流れています</p>
+            </div>
+        </section>
+
+        <!-- ===== 自分 ===== -->
+        <section class="me">
+            <div class="me-head">
+                <span class="me-name" id="myTitle">平民</span>
+                <span class="me-count"><b id="myCount">13</b>枚</span>
+            </div>
+
+            <!-- 手札。タップで選び、上へスワイプで出す -->
+            <div class="hand-wrap">
+                <div class="hand" id="hand"></div>
+                <div class="swipe-guide" id="swipeGuide">↑ スワイプで出す</div>
+            </div>
+
+            <div class="controls">
+                <button class="btn ghost" id="sortBtn">並べ替え</button>
+                <button class="btn ghost" id="passBtn">パス</button>
+                <button class="btn gold" id="playBtn">出す</button>
+            </div>
+        </section>
+
+        <p class="hint" id="hint"></p>
+    </div>
+
+    <!-- ===== 局の結果 ===== -->
+    <div class="overlay" id="resultOverlay">
+        <div class="sheet">
+            <p class="sheet-sub" id="resultSub"></p>
+            <p class="sheet-title" id="resultTitle"></p>
+            <ol class="rank-list" id="rankList"></ol>
+            <button class="btn gold wide" id="nextRoundBtn">次の局へ</button>
+        </div>
+    </div>
+
+    <!-- ===== カード交換 ===== -->
+    <div class="overlay" id="exchangeOverlay">
+        <div class="sheet">
+            <p class="sheet-title">カード交換</p>
+            <p class="sheet-text" id="exchangeText"></p>
+            <div class="exchange-row" id="exchangeCards"></div>
+            <button class="btn gold wide" id="exchangeOkBtn">了承</button>
+        </div>
+    </div>
+
+    <!-- ===== 開始画面 ===== -->
+    <div class="overlay show" id="startOverlay">
+        <div class="sheet">
+            <p class="sheet-crest">富</p>
+            <p class="sheet-title big">大 富 豪</p>
+            <p class="sheet-text">
+                8切り・11バック・革命・階段・縛り・スペ3返し<br>
+                四人打ち／三本勝負
+            </p>
+            <button class="btn gold wide" id="startBtn">対局開始</button>
+        </div>
+    </div>
+
+    <script src="rules.js"></script>
+    <script src="ai.js"></script>
+    <script src="ui.js"></script>
+    <script src="main.js"></script>
+</body>
+
+</html>
